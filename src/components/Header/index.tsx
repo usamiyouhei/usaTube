@@ -12,7 +12,7 @@ function Header() {
         </button>
         <div className="logo">
           <img
-            src="/src/assets/logo.png"
+            src="/src/assets/usa_logo.png"
             alt="YouTube Logo"
             className="youtube-logo"
           />
