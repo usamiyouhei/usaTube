@@ -10,7 +10,7 @@ import VideoDetail from './pages/VideoDetail';
 import EditProfile from './pages/EditProfile';
 
 function App() {
-  
+
 
   return (
    <BrowserRouter>
