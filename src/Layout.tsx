@@ -1,8 +1,12 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet,Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
+import { useAtomValue } from "jotai";
+import { currentUserAtom } from "./modules/auth/current-user.state";
 
 const Layout = () => {
+  const currentUser = useAtomValue(currentUserAtom);
+  if( currentUser == null) return <Navigate to="/signin"/>
   return (
     <div className="youtube-container">
       <Header />
