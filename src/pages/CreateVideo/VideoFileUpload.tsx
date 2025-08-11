@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 interface Props {
   selectedFile: File | null;
   onFileSelect: (file: File | null) => void;
@@ -5,21 +7,48 @@ interface Props {
 
 
 function VideoFileUpload({selectedFile, onFileSelect}: Props) {
-  
+  const [isDragOver, setIsDragOver] = useState(false);
+
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if(file != null && file.type.startsWith("video/")){
-      onFileSelect(file);
+    setFile(file);
+  }
+   
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      setIsDragOver(false);
+      const file = event.dataTransfer.files[0]
+      setFile(file);
     }
+
+    const setFile = (file?: File) => {
+        if(file != null && file.type.startsWith("video/")){
+              onFileSelect(file);
+    };
+    
   };
 
+  
 
   return (
     <div className="upload-section">
       <h2 className="section-title">
         動画ファイル<span className="required">*</span>
       </h2>
-      <div className={`file-drop-zone ${selectedFile && 'has-file'}`}>
+      <div 
+        className={`file-drop-zone ${selectedFile && 'has-file'} ${
+          isDragOver && 'drag-over'
+        }`}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragOver(true);
+        }}
+        onDragLeave={(e) => {
+          e.preventDefault();
+          setIsDragOver(false);
+        }}
+        onDrop={handleDrop}
+      >
         {selectedFile ? (
         <div className="file-info">
             <div className="file-icon">
