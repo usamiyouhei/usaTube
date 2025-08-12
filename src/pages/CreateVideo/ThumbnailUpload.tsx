@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 interface Props {
   selectedFile: File | null;
   onFileSelect: (file: File | null) => void;
@@ -5,9 +7,17 @@ interface Props {
 
 
 function ThumbnailUpload({ selectedFile, onFileSelect}: Props) {
+  const [isDragOver, setIsDragOver] = useState(false)
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     setFile(file)
+  }
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragOver(false);
+    const file = event.dataTransfer.files[0];
+    setFile(file);
   }
 
   const setFile = (file?: File) => {
@@ -25,7 +35,20 @@ function ThumbnailUpload({ selectedFile, onFileSelect}: Props) {
       <h2 className="section-title">
         サムネイル画像<span className="required">*</span>
       </h2>
-      <div className={`file-drop-zone`}>
+      <div 
+        className={`file-drop-zone ${isDragOver && 'drag-over'} ${
+          selectedFile && 'has-file'
+        }`} 
+        onDragOver={(e) => {
+        e.preventDefault();
+        setIsDragOver(true)
+      }}
+      onDragLeave={(e) => {
+        e.preventDefault();
+        setIsDragOver(false);
+      }}
+      onDrop={handleDrop}
+      >
         {selectedFile ? (
         <div className="thumbnail-preview-container">
           <img
