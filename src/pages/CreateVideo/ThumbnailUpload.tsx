@@ -1,20 +1,43 @@
-function ThumbnailUpload() {
+interface Props {
+  selectedFile: File | null;
+  onFileSelect: (file: File | null) => void;
+}
+
+
+function ThumbnailUpload({ selectedFile, onFileSelect}: Props) {
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    setFile(file)
+  }
+
+  const setFile = (file?: File) => {
+    if(file != null && file.type.startsWith('image/')) {
+      onFileSelect(file)
+    }
+  }
+
+  const getPreviewUrl = (file: File) => {
+    return URL.createObjectURL(file)
+  }
+
   return (
     <div className="upload-section">
       <h2 className="section-title">
         サムネイル画像<span className="required">*</span>
       </h2>
       <div className={`file-drop-zone`}>
-        {/* <div className="thumbnail-preview-container">
+        {selectedFile ? (
+        <div className="thumbnail-preview-container">
           <img
-            src={previewUrl}
+            src={getPreviewUrl(selectedFile)}
             alt="Thumbnail preview"
             className="thumbnail-preview"
           />
           <button className="remove-file" onClick={() => onFileSelect(null)}>
             ✕
           </button>
-        </div> */}
+        </div>
+        ) : (
         <div className="drop-content">
           <div className="upload-icon">
             <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
@@ -24,10 +47,16 @@ function ThumbnailUpload() {
           <p className="drop-text">サムネイル画像をドラッグ＆ドロップ</p>
           <label className="file-select-button">
             ファイルを選択
-            <input type="file" accept="image/*" hidden />
+            <input 
+              type="file" 
+              accept="image/*" 
+              hidden 
+              onChange={handleFileSelect}
+            />
           </label>
           <p className="file-format-text">対応形式: JPG, PNG</p>
         </div>
+        ) }
       </div>
     </div>
   );
