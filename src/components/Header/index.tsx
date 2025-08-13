@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import './Header.css';
 import { NavLink } from 'react-router-dom';
 
 function Header() {
+  const [showProfileTooltip, setShowProfileTooltip] = useState(false)
+
   return (
     <header className="header">
       <div className="header-left">
@@ -36,12 +39,16 @@ function Header() {
           <span>作成</span>
         </NavLink>
         <div className="profile-container">
-          <button className="profile-button">
+          <button 
+            className="profile-button"
+            onClick={() => setShowProfileTooltip(!showProfileTooltip)}
+          >
             <img
               src="https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
               alt="Profile"
             />
           </button>
+          {showProfileTooltip && (
           <div className="profile-tooltip">
             <div className="profile-tooltip-header">
               <img
@@ -52,7 +59,10 @@ function Header() {
               <div className="profile-tooltip-info">
                 <div className="profile-tooltip-name">テストユーザー</div>
               </div>
-              <button className="close-tooltip-button">
+              <button 
+                className="close-tooltip-button"
+                onClick={() => setShowProfileTooltip(false)}
+                >
                 <svg width="24" height="24" viewBox="0 0 24 24">
                   <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
                 </svg>
@@ -73,6 +83,7 @@ function Header() {
               </div>
             </div>
           </div>
+            )}
         </div>
       </div>
     </header>
