@@ -9,23 +9,27 @@ type CreateParams = {
   isPublic: boolean;
 }
 
+type Pagination = {
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export const videoRepository = {
   async create(params: CreateParams): Promise<Video>{
     const result = await api.postForm("/videos", params);
     return new Video(result.data);
+  },
+
+  async find(
+    paginationParams: { page: number; limit: number;} = { page: 1, limit: 9}
+  ): Promise<{videos: Video[], pagination: Pagination }> {
+    const result = await api.get("/videos", {
+      params: { ...paginationParams}
+    });
+    return {
+      videos: result.data.videos.map((video: Video) => new Video(video)),
+      pagination: result.data.pagination,
+    }
   }
-
-// export const videoRepository = {
-//   async create(params: CreateParams): Promise<Video> {
-//     const fd = new FormData();
-//     // ↓サーバーが期待しているフィールド名に合わせる（例）
-//     fd.append("video", params.video);             // upload.fields([{ name: 'video' }]) と対応
-//     fd.append("thumbnail", params.thumbnail);     // 同上
-//     fd.append("title", params.title);
-//     fd.append("description", params.description);
-//     fd.append("isPublic", String(params.isPublic)); // ← multipart だと文字列になる
-
-//     const result = await api.post("/videos", fd); // ヘッダは axios/ブラウザが自動付与
-//     return new Video(result.data);
-//   },
 }

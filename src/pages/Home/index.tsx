@@ -1,16 +1,41 @@
 import VideoCard from './VideoCard';
 import './Home.css';
+import { useEffect, useState } from 'react';
+import { videoRepository } from '../../modules/videos/video.repository';
+import type { Video } from '../../modules/videos/video.entity';
+import { useSearchParams } from 'react-router-dom';
 
 function Home() {
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [queryParams, setQueryParams] = useSearchParams();
+  const page = parseInt(queryParams.get('page') || '1')
+
+  useEffect(() => {
+    fetchVideos()
+  }, [page])
+  
+
+  const fetchVideos = async () => {
+    try {
+      setIsLoading(true);
+      const { videos } = await videoRepository.find({ page,limit: 1 })
+      setVideos(videos);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if(isLoading) return <div>Loading...</div>
+
   return (
     <div>
       <div className="video-grid">
-        <VideoCard />
-        <VideoCard />
-        <VideoCard />
-        <VideoCard />
-        <VideoCard />
-        <VideoCard />
+        {videos.map((video) => (
+          <VideoCard video={video}/>
+        ))}
       </div>
       <div className="pagination">
         <button className="pagination-btn prev-btn">
