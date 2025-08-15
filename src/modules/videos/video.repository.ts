@@ -40,5 +40,9 @@ export const videoRepository = {
   async updateIsPublic(id:string, isPublic: boolean):Promise<Video> {
     const result = await api.put(`/videos/${id}/is-public`, { isPublic });
     return new Video(result.data)
+  },
+  async delete(id: string):Promise<boolean> {
+    await api.delete(`/videos/${id}`);
+    return true;
   }
 }
