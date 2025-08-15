@@ -8,9 +8,32 @@ import CreateVideo from './pages/CreateVideo';
 import MyVideos from './pages/MyVideos';
 import VideoDetail from './pages/VideoDetail';
 import EditProfile from './pages/EditProfile';
+import { useState, useEffect } from 'react';
+import { currentUserAtom } from './modules/auth/current-user.state';
+import { useSetAtom } from 'jotai';
+import { authRepository } from './modules/auth/auth.repository';
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+  const setCurrentUser = useSetAtom(currentUserAtom);
 
+
+  useEffect(() => {
+    fetchCurrentUser()
+  }, [])
+  
+  const fetchCurrentUser = async () => {
+    try {
+      const user = await authRepository.getCurrentUser();
+      setCurrentUser(user);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  if(isLoading) return <div/>
 
   return (
    <BrowserRouter>
