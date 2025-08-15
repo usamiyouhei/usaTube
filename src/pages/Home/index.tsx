@@ -9,19 +9,21 @@ function Home() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [queryParams, setQueryParams] = useSearchParams();
+  const keyword = queryParams.get('keyword');
   const page = parseInt(queryParams.get('page') || '1')
   const [totalPages,setTotalPages] = useState<number | undefined>(undefined)
 
   useEffect(() => {
     fetchVideos()
-  }, [page])
+  }, [page, keyword])
   
 
   const fetchVideos = async () => {
     try {
       setIsLoading(true);
-      const { videos, pagination } = await videoRepository.find({
-          page,limit: 1 
+      const { videos, pagination } = await videoRepository.find(keyword,{
+          page,
+          limit: 9,
         });
       setVideos(videos);
       setTotalPages(pagination.totalPages)
@@ -46,6 +48,7 @@ function Home() {
           className="pagination-btn prev-btn"
           disabled={ page === 1 }
           onClick={() => setQueryParams({
+            keyword: keyword ?? '',
             page:(page - 1).toString()
           })}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -57,6 +60,7 @@ function Home() {
           className="pagination-btn next-btn"
           disabled={page === totalPages}
           onClick={() => setQueryParams({
+            keyword: keyword ?? '',
             page:(page + 1).toString()
           })
           }>
