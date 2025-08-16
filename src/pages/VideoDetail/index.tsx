@@ -1,6 +1,34 @@
+import { useParams } from 'react-router-dom';
 import './VideoDetail.css';
+import { useEffect, useState } from 'react';
+import { videoRepository } from '../../modules/videos/video.repository';
+import { Video } from '../../modules/videos/video.entity';
 
 function VideoDetail() {
+  const { id } = useParams();
+  const [video, setVideo] = useState<Video>();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchVideo()
+  }, [id])
+  
+
+  const fetchVideo = async () => {
+    try {
+      setIsLoading(true);
+      const video = await videoRepository.findOne(id!);
+      setVideo(video);
+    } catch (error){
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  if(isLoading) return <div>Loading...</div>
+  if(video === null) return <div>Videoの取得に失敗しました</div>
+
   return (
     <>
       <div className="layout">
@@ -10,24 +38,24 @@ function VideoDetail() {
               <div className="video-player">
                 <video
                   controls
-                  poster="https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
+                  poster={video?.thumbnailUrl}
                 >
-                  <source />
+                  <source src={video?.url}/>
                 </video>
               </div>
               <div className="video-info-section">
-                <h1 className="video-detail-title">テストビデオ</h1>
+                <h1 className="video-detail-title">{video?.title}</h1>
                 <div className="video-meta-bar">
                   <div className="video-stats">
                     <span className="upload-date">
-                      2025-01-01 12:00:00 アップロード
+                      {video?.createdAt.toLocaleString()} アップロード
                     </span>
                   </div>
                 </div>
               </div>
               <div className="channel-info-section">
                 <div className="video-detail-video-description">
-                  テストビデオの説明
+                  {video?.description ?? 'なし'}
                 </div>
               </div>
             </div>

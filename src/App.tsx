@@ -42,9 +42,9 @@ function App() {
       <Route path='/signup' element={<Signup/>}/>
       <Route path='/' element={<Layout/>}>
         <Route index element={<Home />}/>
+        <Route path='/videos/:id' element={<VideoDetail/>}/>
         <Route path='/create-video' element={<CreateVideo/>}/>
         <Route path='/my-videos' element={<MyVideos/>}/>
-        <Route path='/videos/:id' element={<VideoDetail/>}/>
         <Route path='/edit-profile' element={<EditProfile/>}/>
       </Route>
     </Routes>

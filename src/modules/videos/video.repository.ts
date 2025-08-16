@@ -33,6 +33,10 @@ export const videoRepository = {
       pagination: result.data.pagination,
     };
   },
+  async findOne(id: string) :Promise<Video>{
+    const result = await api.get(`/videos/${id}`)
+    return new Video(result.data)
+  },
   async findMine(): Promise<Video[]>{
     const result = await api.get('/videos/mine');
     return result.data.map((video:Video) => new Video(video))
@@ -40,5 +44,9 @@ export const videoRepository = {
   async updateIsPublic(id:string, isPublic: boolean):Promise<Video> {
     const result = await api.put(`/videos/${id}/is-public`, { isPublic });
     return new Video(result.data)
+  },
+  async delete(id: string):Promise<boolean> {
+    await api.delete(`/videos/${id}`);
+    return true;
   }
 }
