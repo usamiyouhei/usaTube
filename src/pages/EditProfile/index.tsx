@@ -1,7 +1,39 @@
+import { useAtom } from 'jotai';
 import './EditProfile.css';
+import { currentUserAtom } from '../../modules/auth/current-user.state';
+import { useState } from 'react';
 
 function EditProfile() {
-  const 
+  const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
+  const [selectedAvatar,setSelectedAvatar] = useState<File | undefined>(undefined);
+  const [userName, setUserName] = useState(currentUser!.name);
+  const [isDragOver, setIsDragOver] = useState(false)
+
+  const handleAvatarSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    setFile(file)
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragOver(false);
+    const file = event.dataTransfer.files[0]
+    setFile(file)
+
+  }
+
+  const setFile = (file?: File) => {
+    if(file != null && file.type.startsWith('image/')) {
+      setSelectedAvatar(file)
+    }
+  }
+
+  const getAvatarURL = () => {
+    if(selectedAvatar == null) {
+      return currentUser?.iconUrl;
+  }
+  return URL.createObjectURL(selectedAvatar)
+}
 
   return (
     <main>
@@ -19,12 +51,23 @@ function EditProfile() {
             <div className="avatar-edit-container">
               <div className="current-avatar">
                 <img
-                  src="https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
+                  src={getAvatarURL()}
                   alt="Current Avatar"
                   className="avatar-preview"
                 />
               </div>
-              <div className={`avatar-drop-zone`}>
+              <div 
+                className={`avatar-drop-zone ${isDragOver && 'drag-over'}`} 
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragOver(true)
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  setIsDragOver(false)
+                }}
+                onDrop={handleDrop}
+              >
                 <div className="drop-content">
                   <div className="upload-icon">
                     <svg
@@ -41,17 +84,19 @@ function EditProfile() {
                   </p>
                   <label className="file-select-button">
                     ファイルを選択
-                    <input type="file" accept="image/*" hidden />
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      hidden
+                      onChange={handleAvatarSelect} />
                   </label>
                   <p className="file-format-text">
                     対応形式: JPG, PNG
                   </p>
                 </div>
-                {/* <button
-                    className="remove-avatar"
-                  >
-                    元に戻す
-                  </button> */}
+                {selectedAvatar && (
+                <button className="remove-avatar">元に戻す</button>
+                )}
               </div>
             </div>
           </div>
