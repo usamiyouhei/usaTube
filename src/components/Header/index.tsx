@@ -1,16 +1,23 @@
 import { useEffect, useState } from 'react';
 import './Header.css';
 import { NavLink, useSearchParams } from 'react-router-dom';
+import { useAtom } from 'jotai';
+import { currentUserAtom } from '../../modules/auth/current-user.state';
 
 function Header() {
   const [showProfileTooltip, setShowProfileTooltip] = useState(false);
   const [queryParams, setQueryParams] = useSearchParams()
   const [keyword, setKeyword] = useState(queryParams.get('keyword'));
-
+  const [currentUser, setCurrentUser] = useAtom(currentUserAtom)
 
   useEffect(() => {
     setKeyword(queryParams.get('keyword'))
   }, [queryParams])
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    setCurrentUser(undefined);
+  }
   
   return (
     <header className="header">
@@ -61,7 +68,7 @@ function Header() {
             onClick={() => setShowProfileTooltip(!showProfileTooltip)}
           >
             <img
-              src="https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
+              src={currentUser!.iconUrl}
               alt="Profile"
             />
           </button>
@@ -69,12 +76,12 @@ function Header() {
           <div className="profile-tooltip">
             <div className="profile-tooltip-header">
               <img
-                src="https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
+                src={currentUser!.iconUrl}
                 alt="Profile"
                 className="profile-tooltip-avatar"
               />
               <div className="profile-tooltip-info">
-                <div className="profile-tooltip-name">テストユーザー</div>
+                <div className="profile-tooltip-name">{currentUser!.name}</div>
               </div>
               <button 
                 className="close-tooltip-button"
@@ -87,7 +94,7 @@ function Header() {
             </div>
             <div className="profile-tooltip-divider"></div>
             <div className="profile-tooltip-menu">
-              <div className="profile-tooltip-item">
+              <div className="profile-tooltip-item" onClick={logout}>
                 <svg
                   width="24"
                   height="24"
