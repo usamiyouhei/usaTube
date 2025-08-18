@@ -2,12 +2,15 @@ import { useAtom } from 'jotai';
 import './EditProfile.css';
 import { currentUserAtom } from '../../modules/auth/current-user.state';
 import { useState } from 'react';
+import { useFlashMessage } from '../../modules/flash-message/flash-massege.state';
+import { accountRepository } from '../../modules/account/account.repository';
 
 function EditProfile() {
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
   const [selectedAvatar,setSelectedAvatar] = useState<File | undefined>(undefined);
   const [userName, setUserName] = useState(currentUser!.name);
-  const [isDragOver, setIsDragOver] = useState(false)
+  const [isDragOver, setIsDragOver] = useState(false);
+  const { showMessage } = useFlashMessage()
 
   const handleAvatarSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -33,7 +36,30 @@ function EditProfile() {
       return currentUser?.iconUrl;
   }
   return URL.createObjectURL(selectedAvatar)
-}
+};
+
+  const updateProfile = async() => {
+    if(!userName.trim()) {
+      showMessage('ユーザー名は必須です', 'error');
+      return;
+    }
+
+    try {
+      const user = await accountRepository.updateProfile(
+        userName,
+        selectedAvatar
+      );
+      setCurrentUser(user);
+      showMessage('プロフィールを更新しました', 'success')
+    } catch (error) {
+      console.error(error);
+      showMessage('プロフィールを更新に失敗しました', 'error')
+    }
+  };
+  const clearForm = () => {
+    setSelectedAvatar(undefined);
+    setUserName(currentUser!.name)
+  }
 
   return (
     <main>
@@ -109,12 +135,19 @@ function EditProfile() {
               type="text"
               className="username-input"
               placeholder="ユーザー名を入力してください"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
             />
           </div>
 
           <div className="edit-profile-actions">
-            <button className="save-button">変更を保存</button>
-            <button className="cancel-button">キャンセル</button>
+            <button 
+              className="save-button"
+              disabled={!userName.trim()}
+              onClick={updateProfile}>変更を保存</button>
+            <button 
+              className="cancel-button"
+              onClick={clearForm}>キャンセル</button>
           </div>
         </div>
       </div>
